@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <context:component-scan
+            base-package="com.ld.gmall.service.impl"></context:component-scan>
+
+    <dubbo:application
+            name="dubbo-order-service-consumer"></dubbo:application>
+
+    <dubbo:registry address="zookeeper://127.0.0.1:2181"></dubbo:registry>
+
+    <!-- 配置本地存根 -->
+    <!-- 生命需要调用的远程服务的接口：生成远程服务代理 -->
+    <!-- timeout默认超时时间是1000毫秒 -->
+    <!-- 1).精确优先:既方法大于接口大于全局 2).消费者优先(如果级别一样，则消费方优先，提供方次之) -->
+    <!-- retries:重试调用次数，不包含第一次调用，0代表不重试 -->
+    <dubbo:reference
+            interface="com.ld.gmall.service.UserService" id="userService"
+            timeout="5000" retries="3" version="1.0.0"
+            stub="com.ld.gmall.service.impl.OrderServiceStub">
+        <!-- <dubbo:method name="getUserAddressList" timeout="1000"></dubbo:method> -->
+        <!-- check="false" -->
+    </dubbo:reference>
+
+    <!-- 配置当前消费者 的统一规则：所有的服务都不检查 -->
+    <dubbo:consumer check="false" timeout="3000"></dubbo:consumer>
+
+    <!-- 链接监控中心 -->
+    <dubbo:monitor protocol="registry"></dubbo:monitor>
+    <!-- <dubbo:monitor address="127.0.0.1:7070"></dubbo:monitor> -->
+
+
+</beans>
